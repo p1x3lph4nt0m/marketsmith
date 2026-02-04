@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>How to Play</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <style>
+        body {
+            margin: 0;
+            font-family: "Segoe UI", Arial, sans-serif;
+            background-color: #21305c;
+            color: #E6EAF2;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 60px auto;
+            padding: 40px;
+            background-color: #5572b567;
+            border-radius: 14px;
+            box-shadow: 0 0 40px rgba(202, 133, 72, 0.338);
+        }
+
+        h1 {
+            text-align: center;
+            font-size: 36px;
+            color: #E6EAF2;
+            margin-bottom: 10px;
+            letter-spacing: 0.5px;
+        }
+
+        .subtitle {
+            text-align: center;
+            color: #B3B8C5;
+            margin-bottom: 40px;
+            font-size: 15px;
+        }
+
+        h2 {
+            margin-top: 38px;
+            padding: 16px 18px;
+            background-color: rgba(237, 239, 242, 0.08);
+            border-left: 4px solid #4FA3FF;
+            border-radius: 8px;
+            color: #E6EAF2;
+            letter-spacing: 0.3px;
+        }
+
+        ul {
+            margin-left: 22px;
+        }
+
+        li {
+            margin-bottom: 16px;
+            color: #D1D6E0;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+
+    <h1>HOW TO PLAY</h1>
+    <div class="subtitle">
+        MARKETSMITH
+    </div>
+
+    <h2>Interface</h2>
+    <ul>
+        <li>All registered players will be divided into groups of six.</li>
+        <li>One common playing table will be shared among players of the group.</li>
+        <li>All players on the table can view the current question along with the holdings and PnL of other players.</li>
+    </ul>
+
+    <h2>Game Framework</h2>
+    <ul>
+        <li>Six digits (1-9) are generated at the start of each round.</li>
+        <li>The digits remain unrevealed throughout the round.</li>
+        <li>The PnL of every player at the start of the round will be set to zero.</li>
+    </ul>
+
+    <h2>Question Phase</h2>
+    <ul>
+        <li>One question appears on the dashboard at the start of every turn.</li>
+        <li>The correct answer corresponds to the digit for that turn.</li>
+        <li>Players must keep answers to themselves.</li>
+    </ul>
+
+    <h2>Assets & Ownership</h2>
+    <ul>
+        <li>The value of one asset equals the <strong>sum of all six digits</strong>.</li>
+        <li>Each player starts with 2 assets.</li>
+        <li>An additional asset is given after the third turn.</li>
+        <li>There is no limit on maximum holdings per player.</li>
+    </ul>
+
+    <h2>Trading Rules</h2>
+    <ul>
+        <li>Players may quote bid and/or ask prices after solving the question in the 30-second window.</li>
+        <li>The orders set by players must be of one asset.</li>
+        <li>A trade is executed when bid and ask of two players are met.</li>
+    </ul>
+
+    <h2>Trading Logic & Execution Rules</h2>
+    <ul>
+        <li>If the highest bid is less than the lowest ask, no trades will be executed.</li>
+        <li>If the highest bid is higher than the lowest ask, trades will be executed following the rules similar to a stock exchange.</li>
+        <li>Trades will be executed at the ask price (e.g. Bid : $35 and Ask : $32, then trade will be executed at $32).</li>
+        <li>Orders are matched from best bid and best ask outward.</li>
+        <li>In case of a tie, the player booking the order first will be given priority.</li>
+        <li>No money is kept by the dealer (sum of all players’ PnL is always zero).</li>
+    </ul>
+
+    <h2>End of Round</h2>
+    <ul>
+        <li>True asset value is revealed.</li>
+        <li>Final wealth = PnL + asset valuation.</li>
+        <li>Players are ranked by total profit.</li>
+    </ul>
+
+</div>
+
+</body>
+</html>

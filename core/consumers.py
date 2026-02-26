@@ -2,7 +2,7 @@
 from channels.generic.websocket import AsyncWebsocketConsumer
 import json
 
-class WaitingRoomConsumer(AsyncWebsocketConsumer):
+class WaitingConsumer(AsyncWebsocketConsumer):
     async def connect(self):
         self.game_id = self.scope["url_route"]["kwargs"]["game_id"]
         self.group_name = f"waiting_{self.game_id}"

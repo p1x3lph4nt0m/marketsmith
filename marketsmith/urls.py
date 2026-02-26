@@ -24,7 +24,7 @@ from core.auth_views import register_view
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-
+    path("cron/ping/", views.cron_ping),
     # Screen 1: Login
     path(
         'accounts/login/',

@@ -55,11 +55,28 @@ def trades_df(df: pd.DataFrame) -> pd.DataFrame:
 
     trade_log = []
 
-    for i in range(num_trades):
-        trade_log.append({
-            'from_id': bids_df.iloc[i]['ID'],
-            'to_id': asks_df.iloc[i]['ID'],
-            'amt': min(bids_df.iloc[i]['Amt'], asks_df.iloc[i]['Amt'])
-        })
+    bid_idx = 0
+    ask_idx = 0
+
+    while bid_idx < len(bids_df) and ask_idx < len(asks_df):
+        bid = bids_df.iloc[bid_idx]
+        ask = asks_df.iloc[ask_idx]
+        
+        # Skip self trades
+        if bid['ID'] == ask['ID']:
+            ask_idx += 1
+            continue
+        
+        if bid['Amt'] >= ask['Amt']:
+            trade_log.append({
+                'from_id': ask['ID'],  # seller
+                'to_id': bid['ID'],    # buyer
+                'amt': ask['Amt']      # trade price (usually ask price in most engines)
+            })
+            
+            bid_idx += 1
+            ask_idx += 1
+        else:
+            break
     
     return pd.DataFrame(trade_log, columns=['from_id', 'to_id', 'amt'])

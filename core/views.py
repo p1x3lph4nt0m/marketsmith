@@ -363,32 +363,25 @@ def game_interface(request, game_id):
                     for _, trade in trades.iterrows():
                         buyer = Player.objects.get(id=trade['from_id'])
                         seller = Player.objects.get(id=trade['to_id'])
+                        trade_price = trade['amt']
 
-                        ask_order = next(
-                            (o for o in orders_list
-                             if o.player.id == seller.id and o.order_type == 'ASK'),
-                            None
-                        )
+                        # Update balances
+                        buyer.cash -= trade_price
+                        buyer.asset_count += 1
 
-                        if ask_order:
-                            price = ask_order.price
+                        seller.cash += trade_price
+                        seller.asset_count -= 1
 
-                            # Update balances
-                            buyer.cash -= price
-                            buyer.asset_count += 1
-                            seller.cash += price
-                            seller.asset_count -= 1
+                        buyer.save()
+                        seller.save()
 
-                            buyer.save()
-                            seller.save()
-
-                            # 🔴 STORE TRADE IN JSON FIELD
-                            round_trades.append({
-                                "round": game.current_round,        # ADDED
-                                "buyer": buyer.user.username,
-                                "seller": seller.user.username,
-                                "price": price
-                            })
+                        # Store trade
+                        round_trades.append({
+                            "round": game.current_round,
+                            "buyer": buyer.user.username,
+                            "seller": seller.user.username,
+                            "price": trade_price
+                        })
 
             # 🔴 Save trade log to GameSession
             full_trade_history.extend(round_trades)         # ADDED
@@ -459,7 +452,6 @@ def api_place_order(request):
         game=game,
         round_number=current_round,
         order_type=order_type,
-        is_active=True
     ).exists():
         return JsonResponse({
             'status': 'error',

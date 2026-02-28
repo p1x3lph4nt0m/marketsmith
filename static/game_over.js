@@ -21,8 +21,8 @@ function getCookie(name) {
  * Connects to the backend API to place an order
  */
 async function executeTrade(action) {
-    const priceInput = document.getElementById('price-input');
-    const price = priceInput.value;
+    const priceValue = document.getElementById("price-input").value;
+    const price = Number(priceValue);
 
     if (!price || price <= 0) {
         alert("Enter valid price");

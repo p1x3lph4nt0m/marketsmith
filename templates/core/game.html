@@ -73,7 +73,14 @@
             <div class="trading-controls" style="opacity:0.5; pointer-events:none;">
                 <p style="text-align:center;">Trading Closed</p>
             {% endif %}
-                <input type="number" id="price-input" placeholder="Enter Price">
+                <input
+                        type="number"
+                        id="price-input"
+                        placeholder="Enter price"
+                        min="1"
+                        step="1"
+                        required
+                    />
                 <div class="action-buttons">
                     <button class="btn buy-btn" onclick="executeTrade('Buy')">Buy</button>
                     <button class="btn sell-btn" onclick="executeTrade('Sell')">Sell</button>

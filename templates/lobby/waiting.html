@@ -1,42 +1,108 @@
-<h1>Waiting for players...</h1>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Waiting Room | MARKETSMITH</title>
+    <link href="https://fonts.googleapis.com/css2?family=Lora:wght@700&family=PT+Sans:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            background-color: #0b0510; /* Deep dark purple base */
+            color: #ffffff;
+            font-family: 'PT Sans', sans-serif;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            margin: 0;
+        }
+        .waiting-box {
+            background-color: #180d29; /* Slightly lighter purple for the card */
+            border: 2px solid #3d2b56;
+            border-radius: 8px;
+            padding: 50px 60px;
+            text-align: center;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+        }
+        h1 {
+            color: #fce34d; /* Yellow accent matching your Start button */
+            font-family: 'Lora', serif;
+            margin-top: 0;
+            margin-bottom: 20px;
+            font-size: 2rem;
+        }
+        p {
+            font-size: 1.2rem;
+            margin: 15px 0;
+        }
+        .highlight {
+            color: #fce34d;
+            font-weight: 700;
+        }
+        .count-display {
+            font-size: 1.5rem;
+            background-color: #261642;
+            padding: 15px 30px;
+            border-radius: 5px;
+            display: inline-block;
+            margin-top: 20px;
+            border: 1px solid #4a3074;
+        }
+        /* A simple pulsing animation to show it's "loading" */
+        .pulse {
+            animation: pulse-animation 2s infinite;
+        }
+        @keyframes pulse-animation {
+            0% { opacity: 1; }
+            50% { opacity: 0.5; }
+            100% { opacity: 1; }
+        }
+    </style>
+</head>
+<body>
 
-<p><strong>Your seat:</strong> {{ player.seat_number }}</p>
+    <div class="waiting-box">
+        <h1 class="pulse">Connecting to Market...</h1>
+        
+        <p><strong>Your Assigned Seat:</strong> <span class="highlight">{{ player.seat_number }}</span></p>
+        
+        <div class="count-display">
+            Players Joined: <br>
+            <span id="player-count" class="highlight">{{ player_count }}</span> / {{ max_players }}
+        </div>
+    </div>
 
-<p>
-    Players joined:
-    <span id="player-count">{{ player_count }}</span>
-    / {{ max_players }}
-</p>
+    <script>
+        const gameId = "{{ game.id }}";
+        const maxPlayers = {{ max_players }};
 
-<script>
-    const gameId = "{{ game.id }}";
-    const maxPlayers = {{ max_players }};
+        const protocol = window.location.protocol === "https:" ? "wss://" : "ws://";
+        const socket = new WebSocket(
+            protocol + window.location.host + "/ws/waiting/" + gameId + "/"
+        );
 
-    const protocol = window.location.protocol === "https:" ? "wss://" : "ws://";
-    const socket = new WebSocket(
-        protocol + window.location.host + "/ws/waiting/" + gameId + "/"
-    );
+        socket.onmessage = function (event) {
+            const data = JSON.parse(event.data);
 
-    socket.onmessage = function (event) {
-        const data = JSON.parse(event.data);
+            // Update player count live
+            if (data.type === "player_joined") {
+                document.getElementById("player-count").innerText = data.player_count;
 
-        // Update player count live
-        if (data.type === "player_joined") {
-            document.getElementById("player-count").innerText = data.player_count;
+                // Safety redirect if count hits max
+                if (data.player_count >= maxPlayers) {
+                    window.location.href = "/game/" + gameId + "/";
+                }
+            }
 
-            // Safety redirect if count hits max
-            if (data.player_count >= maxPlayers) {
+            // Direct redirect event triggered by your backend views.py
+            if (data.type === "game_started") {
                 window.location.href = "/game/" + gameId + "/";
             }
-        }
+        };
 
-        // Direct redirect event
-        if (data.type === "game_started") {
-            window.location.href = "/game/" + gameId + "/";
-        }
-    };
-
-    socket.onerror = function () {
-        console.log("WebSocket error");
-    };
-</script>
+        socket.onerror = function () {
+            console.error("WebSocket connection error. Make sure your ASGI server is running.");
+        };
+    </script>
+</body>
+</html>

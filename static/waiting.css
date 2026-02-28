@@ -1,0 +1,77 @@
+/* ===== Ultra Dark Background ===== */
+body {
+    margin: 0;
+    height: 100vh;
+    font-family: 'Segoe UI', sans-serif;
+    background: radial-gradient(circle at center, #0c0718, #030108 70%);
+    color: #e0e0e0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+/* ===== Center Card ===== */
+.waiting-container {
+    background: rgba(15, 10, 25, 0.95);
+    padding: 50px 70px;
+    border-radius: 20px;
+    text-align: center;
+    border: 1px solid rgba(120, 70, 200, 0.15);
+    box-shadow: 0 0 60px rgba(80, 0, 160, 0.15);
+    backdrop-filter: blur(8px);
+}
+
+/* ===== Title ===== */
+h1 {
+    font-size: 34px;
+    margin-bottom: 25px;
+    letter-spacing: 1px;
+    color: #b388ff;
+}
+
+/* ===== Seat Info ===== */
+.seat-info {
+    font-size: 18px;
+    margin-bottom: 15px;
+    color: #cccccc;
+}
+
+/* ===== Player Count ===== */
+.player-count {
+    font-size: 20px;
+    margin-top: 10px;
+}
+
+/* Live Count Highlight */
+#player-count {
+    color: #ffd700;
+    font-weight: bold;
+    font-size: 22px;
+}
+
+/* Subtle breathing animation */
+.waiting-container {
+    animation: pulseGlow 3s infinite ease-in-out;
+}
+
+@keyframes pulseGlow {
+    0% { box-shadow: 0 0 40px rgba(80, 0, 160, 0.15); }
+    50% { box-shadow: 0 0 60px rgba(120, 0, 255, 0.25); }
+    100% { box-shadow: 0 0 40px rgba(80, 0, 160, 0.15); }
+}
+
+#refresh-btn {
+    margin-top: 15px;
+    padding: 10px 20px;
+    background: linear-gradient(to right, #8e44ad, #6c5ce7);
+    border: none;
+    border-radius: 8px;
+    color: white;
+    font-weight: bold;
+    cursor: pointer;
+    transition: 0.2s ease;
+}
+
+#refresh-btn:hover {
+    opacity: 0.85;
+}

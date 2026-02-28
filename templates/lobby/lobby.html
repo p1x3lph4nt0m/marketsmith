@@ -1,49 +1,4 @@
-{% comment %} <!DOCTYPE html>
-<html>
-<head>
-    <title>Lobby</title>
-</head>
-<body>
-
-    <h1>Welcome to MarketSmith</h1>
-
-    {% if user.is_authenticated %}
-
-        <p>Hello, {{ user.username }}</p>
-
-        <form action="{% url 'matchmaking' %}" method="POST">
-            {% csrf_token %}
-            <button type="submit">Play</button>
-        </form>
-
-        <form method="post" action="{% url 'logout' %}">
-        {% csrf_token %}
-        <button type="submit">Logout</button>
-        </form>
-
-
-        {% if user.is_authenticated %}
-        <h3>Total Net PnL: {{ total_pnl }}</h3>
-        {% endif %}
-
-
-    {% else %}
-
-        <a href="{% url 'login' %}">
-            <button type="button">Login</button>
-        </a>
-
-        <a href="{% url 'register' %}">
-            <button type="button">Register</button>
-        </a>
-
-    {% endif %}
-
-</body>
-</html> {% endcomment %}
-
 {% load static %}
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -52,6 +7,100 @@
     <title>Lobby | MARKETSMITH</title>
     <link href="https://fonts.googleapis.com/css2?family=Lora:wght@700&family=PT+Sans:wght@400;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="{% static 'style.css' %}">
+    <style>
+    /* Logout Pop-up Styles */
+    #logout-overlay {
+        display: none; /* Hidden by default */
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(13, 6, 20, 0.95); /* Deep dark purple blur */
+        z-index: 9999; /* Stays on top of everything */
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .logout-text {
+        color: #fce34d; /* Technex Gold */
+        font-family: 'Lora', serif;
+        font-size: 2rem;
+        font-weight: bold;
+        letter-spacing: 2px;
+        animation: pulse 1.5s infinite;
+    }
+
+    .spinner {
+        border: 4px solid rgba(255, 255, 255, 0.1);
+        border-top: 4px solid #fce34d;
+        border-radius: 50%;
+        width: 50px;
+        height: 50px;
+        animation: spin 1s linear infinite;
+        margin-bottom: 20px;
+    }
+
+    @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+    @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.7; } 100% { opacity: 1; } }
+</style>
+
+<script>
+    function handleLogout(event) {
+        // 1. Stop the form from submitting instantly
+        event.preventDefault(); 
+        
+        // 2. Show the fancy pop-up overlay
+        document.getElementById('logout-overlay').style.display = 'flex';
+        
+        // 3. Wait exactly 2 seconds (2000 milliseconds), then submit to backend
+        setTimeout(function() {
+            document.getElementById('logout-form').submit();
+        }, 2000);
+    }
+</script>
+    <style>
+    /* Upgraded Profile Table Styling */
+    .profile-table-fixed {
+        width: 100%;
+        max-width: 600px;
+        margin: 40px auto;
+        border-collapse: collapse;
+        background-color: #1a0f2e; /* Matches your dark panel aesthetic */
+        border-radius: 8px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+        overflow: hidden;
+    }
+    
+    .profile-table-fixed th, 
+    .profile-table-fixed td {
+        padding: 25px 30px; /* Large spacing */
+        text-align: left;
+        border-bottom: 2px solid #3d2b56;
+        font-size: 1.3rem; /* Much larger font */
+    }
+    
+    .profile-table-fixed th {
+        color: #fce34d; /* Technex Gold */
+        font-weight: 800; /* Extra bold headers */
+        width: 45%;
+        letter-spacing: 1px;
+    }
+    
+    .profile-table-fixed td {
+        color: #ffffff;
+        font-weight: 700; /* Bold values */
+        font-family: monospace; /* Gives it a data/tech feel */
+        font-size: 1.4rem;
+    }
+
+    /* Remove border from the last row */
+    .profile-table-fixed tr:last-child th,
+    .profile-table-fixed tr:last-child td {
+        border-bottom: none;
+    }
+</style>
 </head>
 <body class="lobby-page-bg">
     <header class="cf-header">
@@ -63,23 +112,25 @@
                 <button class="tab-link" onclick="switchTab(event, 'profile')">PROFILE</button>
 
                 {% if not user.is_authenticated %}
-                    <a href="{% url 'login' %}" class="tab-link login-link">LOGIN</a>
-                {% else %}
-                    <form method="post" action="{% url 'logout' %}" style="display:inline;">
-                        {% csrf_token %}
-                        <button type="submit" class="tab-link">LOGOUT</button>
-                    </form>
-                {% endif %}
+    <a href="{% url 'login' %}" class="tab-link login-link">LOGIN</a>
+{% else %}
+    <form id="logout-form" method="post" action="{% url 'logout' %}" style="display:inline;" onsubmit="handleLogout(event)">
+        {% csrf_token %}
+        <button type="submit" class="tab-link">LOGOUT</button>
+    </form>
+{% endif %}
             </nav>
             <img src="{% static 'logo2.png' %}" alt="SNC" class="header-logo">
         </div>
     </header>
-
+<div id="logout-overlay">
+    <div class="spinner"></div>
+    <div class="logout-text">Logging you out...</div>
+</div>
     <main class="dashboard-content">
         <section id="leaderboard" class="tab-pane active">
             <div class="view-header">
                 <h3>Live Market Rankings</h3>
-                <!-- <span id="lobby-status" class="live-indicator">CONNECTING...</span> -->
                 <form method="POST" action="{% url 'matchmaking' %}">
                     {% csrf_token %}
                     <button type="submit" class="join-btn">
@@ -89,9 +140,27 @@
             </div>
             <table class="market-table">
                 <thead>
-                    <tr><th>RANK</th><th>PARTICIPANT</th><th>PNL</th></tr>
+                    <tr>
+                        <th>RANK</th>
+                        <th>PARTICIPANT</th>
+                        <th>TOTAL PNL</th>
+                    </tr>
                 </thead>
-                <tbody id="leaderboard-body"></tbody>
+                <tbody id="leaderboard-body">
+                    {% if leaderboard %}
+                        {% for player in leaderboard %}
+                            <tr>
+                                <td>#{{ forloop.counter }}</td>
+                                <td>{{ player.user__username }}</td>
+                                <td>{{ player.total_pnl }}</td>
+                            </tr>
+                        {% endfor %}
+                    {% else %}
+                        <tr>
+                            <td colspan="3" style="text-align:center;">Login to see leaderboard...</td>
+                        </tr>
+                    {% endif %}
+                </tbody>
             </table>
             <div id="action-zone"></div>
         </section>
@@ -116,7 +185,6 @@
                     <li>One question appears on the dashboard at the start of every turn.</li>
                     <li>The correct answer corresponds to the digit for that turn.</li>
                     <li>Players must keep answers to themselves.</li>
-                    <li>Answers must be kept with the player only.</li>
                 </ul>
                 <h4>Assets & Ownership</h4>
                 <ul>
@@ -150,25 +218,50 @@
         </section>
 
         <section id="profile" class="tab-pane">
-            <div class="view-header"><h3>Participant Data</h3></div>
-            <table class="profile-table-fixed">
-                <tr><th>PARTICIPANT NAME</th><td>AlphaTrader</td></tr>
-                <tr><th>TECHNEX ID</th><td>TX-2026-88</td></tr>
-                <tr><th>CURRENT RANK</th><td>#1</td></tr>
-                <tr><th>CURRENT PNL</th><td id="profile-pnl">0</td></tr>
-            </table>
-        </section>
+    <div class="view-header">
+        <h3 style="text-align: center; width: 100%;">Participant Data</h3>
+    </div>
+    
+    {% if user.is_authenticated %}
+        <table class="profile-table-fixed">
+            <tr>
+                <th>PARTICIPANT NAME</th>
+                <td>{{ user.username }}</td>
+            </tr>
+            <!-- <tr>
+                <th>TECHNEX ID</th>
+                <td>
+                    {% if user.profile.techhnex_id %}
+                        {{ user.profile.techhnex_id }}
+                    {% else %}
+                        Not Provided
+                    {% endif %}
+                </td>
+            </tr> -->
+            <tr>
+                <th>CURRENT PNL</th>
+                <td id="profile-pnl" style="color: {% if total_pnl > 0 %}#4caf50{% elif total_pnl < 0 %}#f44336{% else %}#ffffff{% endif %};">
+                    {{ total_pnl }}
+                </td>
+            </tr>
+        </table>
+    {% else %}
+        <p style="text-align: center; font-size: 1.2rem; color: #fff;">Please login to view your profile data.</p>
+    {% endif %}
+</section>
     </main>
 
     <footer class="single-line-footer">
-        <span class="foot-txt">📞 +91 99608 70886</span>
-        <span class="foot-txt">📞 +91 79921 79759</span>
-        <a href="https://www.technex.in/" target="_blank" class="foot-link">Visit our website</a>
+        <span class="footer-item">📞 +91 99608 70886 : Akshith</span>
+            <span class="footer-item">📞 +91 79921 79759 : Namish</span>
+            <a href="https://www.technex.in/" target="_blank" class="footer-link">
+                Visit Technex Website
+            </a>
     </footer>
 
     <script>
-        const gameId = "{{ game_id }}";
-        const currentUserName = "{{ request.user.username }}";
+        const gameId = "{{ game_id|default:'' }}";
+        const currentUserName = "{{ request.user.username|default:'' }}";
     </script>
     <script src="{% static 'script.js' %}"></script>
     <script>window.onload = initLobby;</script>

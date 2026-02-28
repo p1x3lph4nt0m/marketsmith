@@ -1,37 +1,3 @@
-document.addEventListener('DOMContentLoaded', () => {
-    // 1. DATA EXTRACTION
-    // Extract Game ID from URL: /game/123/ -> 123
-    // const pathParts = window.location.pathname.split('/');
-    // const gameId = pathParts[pathParts.length - 2];
-
-    // 2. OTP-STYLE ANSWER BLOCKS LOGIC
-    const blocks = document.querySelectorAll('.answer-block');
-    
-    blocks.forEach((block, index) => {
-        block.addEventListener('input', (e) => {
-            if (e.target.value.length === 1) {
-                if (index < blocks.length - 1) {
-                    blocks[index + 1].focus();
-                }
-            }
-        });
-
-        block.addEventListener('keydown', (e) => {
-            if (e.key === 'Backspace' && e.target.value === '') {
-                if (index > 0) {
-                    blocks[index - 1].focus();
-                }
-            }
-        });
-    });
-
-    if(blocks.length > 0) {
-        blocks[0].focus();
-    }
-
-    // 3. EXPOSE GAME ID GLOBALLY FOR FUNCTIONS
-    // window.currentGameId = gameId;
-});
 
 /**
  * Helper to get Django CSRF Token from cookies
@@ -58,60 +24,39 @@ async function executeTrade(action) {
     const priceInput = document.getElementById('price-input');
     const price = priceInput.value;
 
-    if (!price) {
-        alert("Please enter a price first!");
+    if (!price || price <= 0) {
+        alert("Enter valid price");
         return;
     }
 
-
-    // This sends the data to your Django 'api_order' view
-    fetch('/api/order/', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-            'X-CSRFToken': '{{ csrf_token }}' // Standard security
-        },
-        body: JSON.stringify({
-            price: price,
-            order_type: 'BID' // Or 'ASK' based on button clicked
-        })
-    })
-    .then(response => response.json())
-    .then(data => alert(data.message));
-
-
-
-
-    // Prepare data for Django View (api_place_order)
-    const orderData = {
-        'order_type': action === 'Buy' ? 'BID' : 'ASK',
+    const orderData = new URLSearchParams({
+        'type': action === 'Buy' ? 'BID' : 'ASK',
         'price': parseInt(price),
         'game_id': window.currentGameId
-    };
+    });
 
     try {
         const response = await fetch('/api/order/', {
             method: 'POST',
             headers: {
-                'Content-Type': 'application/json',
+                'Content-Type': 'application/x-www-form-urlencoded',
                 'X-CSRFToken': getCookie('csrftoken')
             },
-            body: JSON.stringify(orderData)
+            body: orderData
         });
 
         const result = await response.json();
 
         if (result.status === 'queued') {
-            // Success: Add to the "Working Orders" UI
             addOrderToUI(action, price);
             priceInput.value = '';
         } else {
-            // Failure: Show error from backend (e.g., "No assets to sell")
             alert(result.message);
         }
+
     } catch (error) {
         console.error('Error placing order:', error);
-        alert("Connection lost. Could not place order.");
+        alert("Connection lost.");
     }
 }
 
@@ -133,3 +78,50 @@ function addOrderToUI(action, price) {
 
     ordersList.appendChild(orderRow);
 }
+
+// document.addEventListener("DOMContentLoaded", () => {
+//     const tradeContainer = document.getElementById("trades-list");
+//     const tradeDataElement = document.getElementById("trade-data");
+
+//     if (!tradeContainer || !tradeDataElement) return;
+
+//     let allTrades = [];
+//     try {
+//         // This reads the trade_log already being sent by your views.py
+//         allTrades = JSON.parse(tradeDataElement.textContent);
+//     } catch (err) {
+//         allTrades = [];
+//     }
+
+//     tradeContainer.innerHTML = "";
+
+//     // 1. Filter trades where the current user's name appears as buyer or seller
+//     const myTrades = allTrades.filter(t => 
+//         t.buyer === window.currentUserName || t.seller === window.currentUserName
+//     );
+
+//     // 2. Handle Case: No trades found
+//     if (myTrades.length === 0) {
+//         tradeContainer.innerHTML = '<div class="data-row"><span>-</span><span>-</span><span>-</span></div>';
+//         return;
+//     }
+
+//     // 3. Handle Case: Trades found
+//     myTrades.forEach(trade => {
+//         const row = document.createElement("div");
+//         row.className = "data-row";
+
+//         // Logic: Compare strings to find the partner and the action
+//         const isBuyer = trade.buyer === window.currentUserName;
+//         const partner = isBuyer ? trade.seller : trade.buyer;
+//         const action = isBuyer ? "Buy" : "Sell";
+//         const color = isBuyer ? "#38a169" : "#e53e3e";
+
+//         row.innerHTML = `
+//             <span>${partner}</span>
+//             <span>${trade.price}</span>
+//             <span style="color: ${color}; font-weight: bold;">${action}</span>
+//         `;
+//         tradeContainer.appendChild(row);
+//     });
+// });

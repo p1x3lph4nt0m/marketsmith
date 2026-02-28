@@ -1,45 +1,124 @@
-<h2>Final Leaderboard</h2>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Final Leaderboard | MarketSmith</title>
+    <link href="https://fonts.googleapis.com/css2?family=Lora:wght@700&family=PT+Sans:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            background-color: #0b0510; /* Deep dark purple */
+            color: #ffffff;
+            font-family: 'PT Sans', sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            margin: 0;
+        }
+        .leaderboard-container {
+            background-color: #1a0f2e;
+            border: 2px solid #3d2b56;
+            border-radius: 12px;
+            padding: 40px;
+            width: 80%;
+            max-width: 800px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.6);
+        }
+        h2 {
+            color: #fce34d; /* Technex Gold */
+            font-family: 'Lora', serif;
+            text-align: center;
+            font-size: 2.5rem;
+            margin-top: 0;
+            margin-bottom: 30px;
+            letter-spacing: 1px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        th, td {
+            padding: 15px;
+            text-align: center;
+            border-bottom: 1px solid #3d2b56;
+            font-size: 1.2rem;
+        }
+        th {
+            color: #aaa;
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        /* Highlight colors for PnL */
+        .pnl-positive { color: #4caf50; font-weight: bold; }
+        .pnl-negative { color: #f44336; font-weight: bold; }
+        .pnl-zero { color: #ffffff; font-weight: bold; }
+        
+        .redirect-msg {
+            margin-top: 35px;
+            text-align: center;
+            color: #888;
+            font-size: 1.1rem;
+        }
+        .countdown {
+            color: #fce34d;
+            font-weight: bold;
+            font-size: 1.3rem;
+        }
+    </style>
+</head>
+<body>
 
-<table border="1" cellpadding="8">
-    <tr>
-        <th>Player</th>
-        <th>Seat</th>
-        <th>Cash</th>
-        <th>Assets</th>
-        <th>Net PnL</th>
-    </tr>
+    <div class="leaderboard-container">
+        <h2>Final Standings</h2>
+        
+        <table>
+            <thead>
+                <tr>
+                    <th>Rank</th>
+                    <th>Player</th>
+                    <th>Seat</th>
+                    <th>Cash</th>
+                    <th>Assets</th>
+                    <th>Net PnL</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for p in players %}
+                <tr>
+                    <td>#{{ forloop.counter }}</td>
+                    <td><strong>{{ p.username }}</strong></td>
+                    <td>{{ p.seat }}</td>
+                    <td>₹{{ p.cash }}</td>
+                    <td>{{ p.assets }}</td>
+                    <td class="{% if p.net_pnl > 0 %}pnl-positive{% elif p.net_pnl < 0 %}pnl-negative{% else %}pnl-zero{% endif %}">
+                        ₹{{ p.net_pnl }}
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
 
-    {% for p in players %}
-    <tr>
-        <td>{{ p.username }}</td>
-        <td>{{ p.seat }}</td>
-        <td>{{ p.cash }}</td>
-        <td>{{ p.assets }}</td>
-        <td>{{ p.net_pnl }}</td>
-    </tr>
-    {% endfor %}
-</table>
+        <div class="redirect-msg">
+            Redirecting to Lobby in <span id="countdown" class="countdown">{{ remaining_time }}</span> seconds...
+        </div>
+    </div>
 
-<p>
-Redirecting to home in
-<span id="countdown">{{ remaining_time }}</span> seconds...
-</p>
+    <script>
+        let timeLeft = parseInt("{{ remaining_time }}", 10);
+        const countdownEl = document.getElementById("countdown");
 
+        const interval = setInterval(() => {
+            timeLeft--;
+            countdownEl.innerText = timeLeft;
 
+            if (timeLeft <= 0) {
+                clearInterval(interval);
+                window.location.href = "/cleanup/{{ game.id }}/";
+            }
+        }, 1000);
+    </script>
 
-<script>
-let timeLeft = {{ remaining_time }};
-const countdownEl = document.getElementById("countdown");
-
-const interval = setInterval(() => {
-    timeLeft--;
-    countdownEl.innerText = timeLeft;
-
-    if (timeLeft <= 0) {
-        clearInterval(interval);
-        window.location.href = "/cleanup/{{ game.id }}/";
-    }
-}, 1000);
-</script>
-
-
+</body>
+</html>

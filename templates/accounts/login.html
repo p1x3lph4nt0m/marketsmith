@@ -3,29 +3,88 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Login | Market</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LOGIN | Technex '26</title>
+    <link href="https://fonts.googleapis.com/css2?family=Bungee&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="{% static 'login.css' %}">
+    <style>
+        /* Matching the layout of the register page */
+        .login-card {
+            max-width: 400px;
+            margin: 0 auto;
+            padding: 40px 35px; /* Slightly more padding since there are fewer inputs */
+            background-color: #f8f9fa;
+            border-radius: 12px;
+        }
+        /* Style for the default Django form.as_p fields */
+        .login-card p {
+            margin-bottom: 15px;
+            text-align: left;
+            color: #333;
+        }
+        .login-card input {
+            width: 100%;
+            padding: 10px;
+            margin-top: 5px;
+            box-sizing: border-box;
+            border-radius: 6px;
+            border: 1px solid #ccc;
+        }
+        .login-submit {
+            width: 100%;
+            padding: 12px;
+            margin-top: 15px;
+            border-radius: 6px;
+            font-weight: bold;
+        }
+    </style>
 </head>
 <body>
+    <div class="bg-3d-container">
+        <div class="orb orb-1"></div>
+        <div class="orb orb-2"></div>
+        <div class="orb orb-3"></div>
+    </div>
 
-    <h2>Login</h2>
+    <header>
+        <div class="header-content">
+            <img src="{% static 'logo.png' %}" alt="IIT BHU Logo" class="main-logo">
+            <img src="{% static 'logo2.png' %}" alt="Event Logo 2" class="secondary-logo">
+        </div>
+    </header>
 
-    {% if form.errors %}
-        <p style="color: red;">
-            Invalid username or password.
-        </p>
-    {% endif %}
+    <main class="content-wrapper">
+        <h1 class="hero-title">MARKETSMITH</h1>
 
-    <form method="POST">
-    {% csrf_token %}
-    {{ form.non_field_errors }}
-    {{ form.as_p }}
-    <button type="submit" class="login-submit">Login</button>
-</form>
-<p class="register-link">
-    Don't have an account?
-    <a href="{% url 'register' %}">Register here</a>
-</p>
+        <div class="login-card">
+            <h2 style="text-align:center; color:#1a1a1a; margin-top:0;">Login</h2>
 
+            {% if form.errors %}
+                <p style="color: red; text-align:center; font-size:0.9rem;">
+                    Invalid username or password.
+                </p>
+            {% endif %}
+
+            <form method="POST">
+                {% csrf_token %}
+                {{ form.non_field_errors }}
+                {{ form.as_p }}
+                <button type="submit" class="login-submit">Login</button>
+            </form>
+            
+            <p style="margin-top: 20px; font-size: 0.9rem; text-align:center; color:#333;">
+                Don't have an account? 
+                <a href="{% url 'register' %}" style="color: #63b3ed;">Register here</a>
+            </p>
+        </div>
+
+        <footer class="single-line-footer">
+            <span class="footer-item">📞 +91 99608 70886 : Akshith</span>
+            <span class="footer-item">📞 +91 79921 79759 : Namish</span>
+            <a href="https://www.technex.in/" target="_blank" class="footer-link">
+                Visit Technex Website
+            </a>
+        </footer>
+    </main>
 </body>
 </html>

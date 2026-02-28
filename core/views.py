@@ -18,7 +18,7 @@ from django.conf import settings
 
 @csrf_exempt
 def cron_ping(request):
-    return HttpResponse({"status": "ok"})
+    return HttpResponse("ok")
 
 @login_required
 def cleanup_game(request, game_id):

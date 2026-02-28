@@ -12,71 +12,57 @@ def trades_df(df: pd.DataFrame) -> pd.DataFrame:
     - 'Time' is the time at which player quotes the trade
     """
     
-    bids_df = df[df['Quote'] == 'bid']
-    asks_df = df[df['Quote'] == 'ask']
+    # Separate book sides
+    bids_df = df[df['Quote'] == 'bid'].copy()
+    asks_df = df[df['Quote'] == 'ask'].copy()
 
-    bids_df = bids_df.sort_values(
-        by=["Amt", "Time"],
-        ascending=[False, True]
+    # Sort by price-time priority
+    # bids_df: Highest price first, then earliest time
+    bids_df.sort_values(
+        by=['Amt', 'Time'],
+        ascending=[False, True],
+        inplace=True
     )
 
-    asks_df = asks_df.sort_values(
-        by=["Amt", "Time"],
-        ascending=[True, True]
+    # asks_df_df: Lowest price first, then earliest time
+    asks_df.sort_values(
+        by=['Amt', 'Time'],
+        ascending=[True, True],
+        inplace=True
     )
 
-    max_bid = bids_df['Amt'].max()
-    min_ask = asks_df['Amt'].min()
-
-    num_bids = num_asks = 0
-
-    for _, bid in bids_df.iterrows():
-        if bid['Amt'] >= min_ask:
-            num_bids += 1
-    
-    for _, ask in asks_df.iterrows():
-        if ask['Amt'] <= max_bid:
-            num_asks += 1
-    
-    num_trades = min(num_bids, num_asks)
-
-    bids_df = bids_df.head(num_trades)
-    asks_df = asks_df.head(num_trades)
-
-    bids_df = bids_df.sort_values(
-        by=["Amt", "Time"],
-        ascending=[False, False]
-    )
-
-    asks_df = asks_df.sort_values(
-        by=["Amt", "Time"],
-        ascending=[False, True]
-    )
-
-    trade_log = []
+    # Reset index for safe positional indexing
+    bids_df.reset_index(drop=True, inplace=True)
+    asks_df.reset_index(drop=True, inplace=True)
 
     bid_idx = 0
     ask_idx = 0
 
+    trade_log = []
+
     while bid_idx < len(bids_df) and ask_idx < len(asks_df):
-        bid = bids_df.iloc[bid_idx]
-        ask = asks_df.iloc[ask_idx]
-        
-        # Skip self trades
-        if bid['ID'] == ask['ID']:
+
+        best_bid = bids_df.iloc[bid_idx]
+        best_ask = asks_df.iloc[ask_idx]
+
+        # Stop if no price cross
+        if best_bid['Amt'] < best_ask['Amt']:
+            break
+
+        # Skip self-trading
+        if best_bid['ID'] == best_ask['ID']:
             ask_idx += 1
             continue
-        
-        if bid['Amt'] >= ask['Amt']:
-            trade_log.append({
-                'from_id': ask['ID'],  # seller
-                'to_id': bid['ID'],    # buyer
-                'amt': ask['Amt']      # trade price (usually ask price in most engines)
-            })
-            
-            bid_idx += 1
-            ask_idx += 1
-        else:
-            break
-    
+
+        # Execute trade
+        trade_log.append({
+            'from_id': best_ask['ID'],  # Seller
+            'to_id': best_bid['ID'],    # Buyer
+            'amt': best_ask['Amt']      # Trade price
+        })
+
+        # Move to next best order
+        bid_idx += 1
+        ask_idx += 1
+
     return pd.DataFrame(trade_log, columns=['from_id', 'to_id', 'amt'])

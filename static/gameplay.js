@@ -21,8 +21,8 @@ function getCookie(name) {
  * Connects to the backend API to place an order
  */
 async function executeTrade(action) {
-    const priceValue = document.getElementById("price-input").value;
-    const price = Number(priceValue);
+    const priceInput = document.getElementById("price-input");
+    const price = Number(priceInput.value);
 
     if (!price || price <= 0) {
         alert("Enter valid price");
@@ -73,7 +73,6 @@ function addOrderToUI(action, price) {
     orderRow.innerHTML = `
         <span style="color: ${actionColor}; font-weight: bold;">${action}</span>
         <span>$${price}</span>
-        <span style="cursor: pointer; color: #a0aec0;" onclick="this.parentElement.remove()">✕</span>
     `;
 
     ordersList.appendChild(orderRow);

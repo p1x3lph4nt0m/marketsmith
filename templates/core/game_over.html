@@ -90,10 +90,10 @@
                     <td>#{{ forloop.counter }}</td>
                     <td><strong>{{ p.username }}</strong></td>
                     <td>{{ p.seat }}</td>
-                    <td>₹{{ p.cash }}</td>
+                    <td>${{ p.cash }}</td>
                     <td>{{ p.assets }}</td>
                     <td class="{% if p.net_pnl > 0 %}pnl-positive{% elif p.net_pnl < 0 %}pnl-negative{% else %}pnl-zero{% endif %}">
-                        ₹{{ p.net_pnl }}
+                        ${{ p.net_pnl }}
                     </td>
                 </tr>
                 {% endfor %}

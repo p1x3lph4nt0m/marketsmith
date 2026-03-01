@@ -39,6 +39,7 @@ class GameSession(models.Model):
     ques_list = models.JSONField(default=list, blank=True)
 
     last_trade_log = models.JSONField(default=list, blank=True)
+    current_round_trades = models.JSONField(default=list, blank=True)
 
     current_round = models.IntegerField(default=1)  # 1 to 6
     round_start_time = models.DateTimeField(null=True, blank=True)

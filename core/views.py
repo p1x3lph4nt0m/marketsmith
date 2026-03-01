@@ -311,7 +311,8 @@ def game_interface(request, game_id):
             'current_server_time': timezone.now(),
             'round_end_time': 0,
             'show_trade_log_popup': True,
-            'trade_log': trade_log,
+            'trade_log': game.last_trade_log or [],              
+            'current_round_trades': game.current_round_trades or [], 
         })
 
     # =====================================================
@@ -363,7 +364,7 @@ def game_interface(request, game_id):
                     for _, trade in trades.iterrows():
                         buyer = Player.objects.get(id=trade['from_id'])
                         seller = Player.objects.get(id=trade['to_id'])
-                        trade_price = trade['amt']
+                        trade_price = int(trade['amt'])
 
                         # Update balances
                         buyer.cash -= trade_price
@@ -376,16 +377,18 @@ def game_interface(request, game_id):
                         seller.save()
 
                         # Store trade
-                        round_trades.append({
+                        trade_data = {
                             "round": game.current_round,
                             "buyer": buyer.user.username,
                             "seller": seller.user.username,
                             "price": trade_price
-                        })
+                        }
+                        round_trades.append(trade_data)
+                        full_trade_history.append(trade_data)
 
             # 🔴 Save trade log to GameSession
-            full_trade_history.extend(round_trades)         # ADDED
             game.last_trade_log = full_trade_history
+            game.current_round_trades = round_trades
             orders_qs.update(is_active=False)
 
             game.round_phase = "log"

@@ -111,7 +111,7 @@
                         <span> ROUND {{ trade.round }}</span>
                         <span>{{ trade.buyer }}</span>
                         <span>{{ trade.seller }}</span>
-                        <span>₹{{ trade.price }}</span>
+                        <span>${{ trade.price }}</span>
                     </div>
                     {% endfor %}
                 </div>
@@ -132,10 +132,10 @@
     text-align:center;
     ">
         <h3>Round Trades</h3>
-        {% if trade_log %}
-            {% for trade in trade_log %}
+        {% if current_round_trades %}
+            {% for trade in current_round_trades %}
                 <div>
-                    {{ trade.buyer }} bought from {{ trade.seller }} @ ₹{{ trade.price }}
+                    {{ trade.buyer }} bought from {{ trade.seller }} @ ${{ trade.price }}
                 </div>
             {% endfor %}
         {% else %}

@@ -56,9 +56,9 @@ def trades_df(df: pd.DataFrame) -> pd.DataFrame:
 
         # Execute trade
         trade_log.append({
-            'from_id': best_ask['ID'],  # Seller
-            'to_id': best_bid['ID'],    # Buyer
-            'amt': best_ask['Amt']      # Trade price
+            'from_id': best_ask['ID'],                              # Seller
+            'to_id': best_bid['ID'],                                # Buyer
+            'amt': (best_ask['Amt'] + best_bid['Amt'] + 1)//2       # Trade price
         })
 
         # Move to next best order
@@ -66,3 +66,4 @@ def trades_df(df: pd.DataFrame) -> pd.DataFrame:
         ask_idx += 1
 
     return pd.DataFrame(trade_log, columns=['from_id', 'to_id', 'amt'])
+

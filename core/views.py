@@ -362,8 +362,8 @@ def game_interface(request, game_id):
 
                 if not trades.empty:
                     for _, trade in trades.iterrows():
-                        buyer = Player.objects.get(id=trade['from_id'])
-                        seller = Player.objects.get(id=trade['to_id'])
+                        buyer = Player.objects.get(id=trade['to_id'])
+                        seller = Player.objects.get(id=trade['from_id'])
                         trade_price = int(trade['amt'])
 
                         # Update balances

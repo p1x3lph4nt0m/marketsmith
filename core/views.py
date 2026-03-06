@@ -108,14 +108,17 @@ def matchmaking(request):
 
     # 2️⃣ Find open waiting game with space
     open_game = (
-        GameSession.objects
-        .select_for_update()
-        .filter(is_active=False, is_finished=False)
-        .annotate(player_count=Count('players'))
-        .filter(player_count__lt=6)
-        .order_by('created_at')
-        .first()
-    )
+    GameSession.objects
+    .filter(is_active=False, is_finished=False)
+    .annotate(player_count=Count('players'))
+    .filter(player_count__lt=6)
+    .order_by('created_at')
+    .first()
+)
+
+# Lock the row separately
+    if open_game:
+        open_game = GameSession.objects.select_for_update().get(id=open_game.id)
 
     # 3️⃣ Create game if none available
     if not open_game:

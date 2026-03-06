@@ -5,3 +5,5 @@ whitenoise
 pandas
 numpy
 python-dotenv
+psycopg2-binary
+dj-database-url

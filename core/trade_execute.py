@@ -23,15 +23,6 @@ def trades_df(df: pd.DataFrame) -> pd.DataFrame:
 
     trade_log = []
 
-    # Track temporary balances during matching
-    assets = {}
-    cash = {}
-
-    # Initialize players
-    for pid in df['ID'].unique():
-        assets[pid] = 3   # starting assets
-        cash[pid] = 0     # starting cash
-
     while bid_idx < len(bids_df) and ask_idx < len(asks_df):
 
         best_bid = bids_df.iloc[bid_idx]
@@ -51,15 +42,6 @@ def trades_df(df: pd.DataFrame) -> pd.DataFrame:
 
         trade_price = (best_ask['Amt'] + best_bid['Amt'] + 1) // 2
 
-        # 🔒 Check balances before matching
-        if assets[seller] < 1:
-            ask_idx += 1
-            continue
-
-        if cash[buyer] < trade_price:
-            bid_idx += 1
-            continue
-
         # Execute trade
         trade_log.append({
             'from_id': seller,
@@ -67,14 +49,8 @@ def trades_df(df: pd.DataFrame) -> pd.DataFrame:
             'amt': trade_price
         })
 
-        # Update temporary balances
-        assets[seller] -= 1
-        cash[seller] += trade_price
-
-        assets[buyer] += 1
-        cash[buyer] -= trade_price
-
         bid_idx += 1
         ask_idx += 1
+
 
     return pd.DataFrame(trade_log, columns=['from_id', 'to_id', 'amt'])
